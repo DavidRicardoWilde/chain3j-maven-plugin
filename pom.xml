@@ -1,0 +1,117 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>io.moac</groupId>
+  <artifactId>dev</artifactId>
+  <packaging>maven-plugin</packaging>
+  <version>0.1.0-SNAPSHOT</version>
+
+  <name>dev Maven Mojo</name>
+  <url>http://maven.apache.org</url>
+  <!--<description>Mojo's chain3j Maven plugin is used to create java classes based on the solidity-->
+    <!--contract files.-->
+  <!--</description>-->
+
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.version>3.6.0</maven.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <solcJ.version>0.4.25</solcJ.version>
+  </properties>
+
+  <dependencies>
+    <!-- maven plugin dependency-->
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>3.6.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core</artifactId>
+      <version>3.6.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugin-tools</groupId>
+      <artifactId>maven-plugin-tools-annotations</artifactId>
+      <version>3.6.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.shared</groupId>
+      <artifactId>file-management</artifactId>
+      <version>3.0.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.plugin-testing</groupId>
+      <artifactId>maven-plugin-testing-harness</artifactId>
+      <version>3.3.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-compat</artifactId>
+      <version>${maven.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- chain3j: crypto, codegen, core -->
+    <!--<dependency>-->
+      <!--<groupId>io.github.moacchain</groupId>-->
+      <!--<artifactId>chain3j</artifactId>-->
+      <!--<version>0.1.0</version>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+      <!--<groupId></groupId>-->
+      <!--<artifactId></artifactId>-->
+      <!--<systemPath></systemPath>-->
+    <!--</dependency>-->
+
+
+    <!-- ehtereum solcj --> <!-- Maybe we need -->
+    <dependency> <!-- -->
+      <groupId>org.ethereum</groupId>
+      <artifactId>solcJ-all</artifactId>
+      <version>${solcJ.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+    </dependency>
+  </dependencies>
+
+  <repositories>
+    <repository>
+      <id>ethereum</id>
+      <url>https://dl.bintray.com/ethereum/maven/</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <version>${maven.version}</version>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+          <encoding>UTF-8</encoding>
+          <compilerArguments>
+            <extdirs>src\lib</extdirs>
+          </compilerArguments>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

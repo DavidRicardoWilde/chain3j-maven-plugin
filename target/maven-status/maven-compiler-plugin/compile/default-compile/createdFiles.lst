@@ -1,0 +1,9 @@
+io\moac\MyMojo.class
+io\moac\SourceDestination.class
+io\moac\solidity\CompilerResult.class
+io\moac\solidity\SolidityCompiler.class
+io\moac\solidity\SolidityCompiler$ParallelReader.class
+io\moac\solidity\SolidityCompiler$Options.class
+io\moac\solidity\SolC.class
+io\moac\Contract.class
+io\moac\JavaClassGeneratorMojo.class
