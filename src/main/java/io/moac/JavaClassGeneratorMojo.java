@@ -1,8 +1,6 @@
 package io.moac;
 //Maven Plugin to generate the java classes out of the solidity contract files.
 
-import io.moac.solidity.CompilerResult;
-import io.moac.solidity.SolidityCompiler;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -11,10 +9,9 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
-
-import org.chain3j.codegen.SolidityFunctionWrapper;
 import io.moac.solidity.CompilerResult;
 import io.moac.solidity.SolidityCompiler;
+import org.chain3j.codegen.SolidityFunctionWrapper;
 
 import java.io.IOException;
 import java.nio.file.Files;

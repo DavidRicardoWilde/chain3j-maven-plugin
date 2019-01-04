@@ -20,23 +20,32 @@
     <solcJ.version>0.4.25</solcJ.version>
   </properties>
 
+  <developers>
+    <developer>
+      <name>Shidian Wang</name>
+      <email>davidgluttongk@outlook.com</email>
+      <organization></organization>
+      <organizationUrl></organizationUrl>
+    </developer>
+  </developers>
+
   <dependencies>
     <!-- maven plugin dependency-->
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
-      <version>3.6.0</version>
+      <version>${maven.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
-      <version>3.6.0</version>
+      <version>${maven.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
-      <artifactId>maven-plugin-tools-annotations</artifactId>
-      <version>3.6.0</version>
+      <artifactId>maven-plugin-annotations</artifactId>
       <scope>provided</scope>
+      <version>${maven.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
@@ -62,10 +71,40 @@
       <!--<artifactId>chain3j</artifactId>-->
       <!--<version>0.1.0</version>-->
     <!--</dependency>-->
+    <!-- https://mvnrepository.com/artifact/io.github.moacchain/chain3j -->
+    <dependency>
+      <groupId>io.github.moacchain</groupId>
+      <artifactId>crypto</artifactId>
+      <version>0.1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>io.github.moacchain</groupId>
+      <artifactId>codegen</artifactId>
+      <version>0.1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>io.github.moacchain</groupId>
+      <artifactId>core</artifactId>
+      <version>0.1.0</version>
+    </dependency>
+
+
+
+
     <!--<dependency>-->
-      <!--<groupId></groupId>-->
-      <!--<artifactId></artifactId>-->
-      <!--<systemPath></systemPath>-->
+      <!--<groupId>org.web3j</groupId>-->
+      <!--<artifactId>crypto</artifactId>-->
+      <!--<version>${web3j.version}</version>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+      <!--<groupId>org.web3j</groupId>-->
+      <!--<artifactId>codegen</artifactId>-->
+      <!--<version>${web3j.version}</version>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+      <!--<groupId>org.web3j</groupId>-->
+      <!--<artifactId>core</artifactId>-->
+      <!--<version>${web3j.version}</version>-->
     <!--</dependency>-->
 
 
@@ -102,6 +141,48 @@
       </plugin>
 
       <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.2</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!--<plugin>-->
+        <!--<groupId>org.apache.maven.plugins</groupId>-->
+        <!--<artifactId>maven-release-plugin</artifactId>-->
+        <!--<version>2.5.3</version>-->
+        <!--<configuration>-->
+          <!--<useReleaseProfile>false</useReleaseProfile>-->
+          <!--<releaseProfiles>release</releaseProfiles>-->
+          <!--<goals>deploy</goals>-->
+        <!--</configuration>-->
+      <!--</plugin>-->
+      <!--<plugin>-->
+        <!--<groupId>org.sonatype.plugins</groupId>-->
+        <!--<artifactId>nexus-staging-maven-plugin</artifactId>-->
+        <!--<version>1.6.8</version>-->
+        <!--<extensions>true</extensions>-->
+        <!--<configuration>-->
+          <!--<serverId>ossrh</serverId>-->
+          <!--<nexusUrl>https://oss.sonatype.org/</nexusUrl>-->
+          <!--<autoReleaseAfterClose>true</autoReleaseAfterClose>-->
+        <!--</configuration>-->
+      <!--</plugin>-->
+
+      <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <source>1.8</source>
@@ -114,4 +195,22 @@
       </plugin>
     </plugins>
   </build>
+
+  <!--<profiles>-->
+    <!--<profile>-->
+      <!---->
+    <!--</profile>-->
+  <!--</profiles>-->
+
+  <!--<distributionManagement>-->
+    <!--<snapshotRepository>-->
+      <!--<id>ossrh</id>-->
+      <!--<url>https://oss.sonatype.org/content/repositories/snapshots</url>-->
+    <!--</snapshotRepository>-->
+    <!--<repository>-->
+      <!--<id>ossrh</id>-->
+      <!--<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>-->
+    <!--</repository>-->
+  <!--</distributionManagement>-->
+
 </project>
