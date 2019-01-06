@@ -1,0 +1,10 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+dev Maven Mojo,io.moac,MyMojo,7,0,0,0,3,0,2,0,2,0
+dev Maven Mojo,io.moac,Contract,0,17,0,0,0,7,0,5,0,5
+dev Maven Mojo,io.moac,SourceDestination,0,24,0,0,0,10,0,7,0,7
+dev Maven Mojo,io.moac,JavaClassGeneratorMojo,65,590,8,46,9,111,8,31,0,12
+dev Maven Mojo,io.moac.solidity,SolidityCompiler,85,233,9,9,17,49,8,12,1,10
+dev Maven Mojo,io.moac.solidity,CompilerResult,0,25,0,2,0,7,0,3,0,2
+dev Maven Mojo,io.moac.solidity,SolidityCompiler.ParallelReader,14,50,2,2,7,14,2,4,0,4
+dev Maven Mojo,io.moac.solidity,SolidityCompiler.Options,0,62,0,0,0,10,0,4,0,4
+dev Maven Mojo,io.moac.solidity,SolC,19,159,1,9,3,38,1,10,0,6

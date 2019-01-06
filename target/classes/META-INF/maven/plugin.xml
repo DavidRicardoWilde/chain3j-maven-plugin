@@ -322,48 +322,6 @@
       <version>3.8.1</version>
     </dependency>
     <dependency>
-      <groupId>org.ow2.asm</groupId>
-      <artifactId>asm</artifactId>
-      <type>jar</type>
-      <version>7.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-archiver</artifactId>
-      <type>jar</type>
-      <version>3.6.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-io</artifactId>
-      <type>jar</type>
-      <version>3.0.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-compress</artifactId>
-      <type>jar</type>
-      <version>1.16.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.objenesis</groupId>
-      <artifactId>objenesis</artifactId>
-      <type>jar</type>
-      <version>2.6</version>
-    </dependency>
-    <dependency>
-      <groupId>org.iq80.snappy</groupId>
-      <artifactId>snappy</artifactId>
-      <type>jar</type>
-      <version>0.4</version>
-    </dependency>
-    <dependency>
-      <groupId>org.tukaani</groupId>
-      <artifactId>xz</artifactId>
-      <type>jar</type>
-      <version>1.8</version>
-    </dependency>
-    <dependency>
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>file-management</artifactId>
       <type>jar</type>
@@ -386,6 +344,30 @@
       <artifactId>commons-io</artifactId>
       <type>jar</type>
       <version>2.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-archiver</artifactId>
+      <type>jar</type>
+      <version>2.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
+      <type>jar</type>
+      <version>1.0-alpha-9-stable-1</version>
+    </dependency>
+    <dependency>
+      <groupId>classworlds</groupId>
+      <artifactId>classworlds</artifactId>
+      <type>jar</type>
+      <version>1.1-alpha-2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-io</artifactId>
+      <type>jar</type>
+      <version>2.0.4</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -500,6 +482,12 @@
       <artifactId>jffi</artifactId>
       <type>jar</type>
       <version>1.2.14</version>
+    </dependency>
+    <dependency>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm</artifactId>
+      <type>jar</type>
+      <version>5.0.3</version>
     </dependency>
     <dependency>
       <groupId>org.ow2.asm</groupId>

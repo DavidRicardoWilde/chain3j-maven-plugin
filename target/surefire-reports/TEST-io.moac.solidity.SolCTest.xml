@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="5" failures="0" name="io.moac.solidity.SolCTest" time="1.053" errors="0" skipped="0">
+<testsuite tests="5" failures="0" name="io.moac.solidity.SolCTest" time="1.181" errors="0" skipped="0">
   <properties>
     <property name="idea.version" value="2018.3.1"/>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
@@ -62,9 +62,9 @@
     <property name="sun.desktop" value="windows"/>
     <property name="sun.cpu.isalist" value="amd64"/>
   </properties>
-  <testcase classname="io.moac.solidity.SolCTest" name="loadExecutableOnWindows" time="0.461"/>
-  <testcase classname="io.moac.solidity.SolCTest" name="loadExecutableOnMac" time="0.198"/>
-  <testcase classname="io.moac.solidity.SolCTest" name="takeExecutableFromSystemPath" time="0.001"/>
-  <testcase classname="io.moac.solidity.SolCTest" name="loadExecutableOnLinux" time="0.045"/>
-  <testcase classname="io.moac.solidity.SolCTest" name="initExecutable" time="0.348"/>
+  <testcase classname="io.moac.solidity.SolCTest" name="loadExecutableOnWindows" time="0.457"/>
+  <testcase classname="io.moac.solidity.SolCTest" name="loadExecutableOnMac" time="0.204"/>
+  <testcase classname="io.moac.solidity.SolCTest" name="takeExecutableFromSystemPath" time="0.002"/>
+  <testcase classname="io.moac.solidity.SolCTest" name="loadExecutableOnLinux" time="0.062"/>
+  <testcase classname="io.moac.solidity.SolCTest" name="initExecutable" time="0.456"/>
 </testsuite>

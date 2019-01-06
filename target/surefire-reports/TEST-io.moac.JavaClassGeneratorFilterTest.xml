@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="3" failures="0" name="io.moac.solidity.SolidityCompilerTest" time="0.195" errors="0" skipped="0">
+<testsuite tests="3" failures="0" name="io.moac.JavaClassGeneratorFilterTest" time="0.826" errors="0" skipped="0">
   <properties>
     <property name="idea.version" value="2018.3.1"/>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
@@ -62,7 +62,7 @@
     <property name="sun.desktop" value="windows"/>
     <property name="sun.cpu.isalist" value="amd64"/>
   </properties>
-  <testcase classname="io.moac.solidity.SolidityCompilerTest" name="invalidContractVersion" time="0.079"/>
-  <testcase classname="io.moac.solidity.SolidityCompilerTest" name="invalidContractSyntax" time="0.044"/>
-  <testcase classname="io.moac.solidity.SolidityCompilerTest" name="compileContract" time="0.072"/>
+  <testcase classname="io.moac.JavaClassGeneratorFilterTest" name="filteredContractMixed" time="0.257"/>
+  <testcase classname="io.moac.JavaClassGeneratorFilterTest" name="filteredContractInclude" time="0.298"/>
+  <testcase classname="io.moac.JavaClassGeneratorFilterTest" name="filteredContractExclude" time="0.271"/>
 </testsuite>

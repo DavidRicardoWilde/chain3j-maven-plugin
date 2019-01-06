@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JavaClassGeneratorMojo.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">dev Maven Mojo</a> &gt; <a href="index.source.html" class="el_package">io.moac</a> &gt; <span class="el_source">JavaClassGeneratorMojo.java</span></div><h1>JavaClassGeneratorMojo.java</h1><pre class="source lang-java linenums">package io.moac;
+//Maven Plugin to generate the java classes out of the solidity contract files.
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.shared.model.fileset.FileSet;
+import org.apache.maven.shared.model.fileset.util.FileSetManager;
+import io.moac.solidity.CompilerResult;
+import io.moac.solidity.SolidityCompiler;
+import org.chain3j.codegen.SolidityFunctionWrapper;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
+@Mojo(name = &quot;generate-sources&quot;, defaultPhase = LifecyclePhase.PROCESS_RESOURCES)
+<span class="fc" id="L32">public class JavaClassGeneratorMojo extends AbstractMojo {</span>
+    private static final String DEFAULT_INCLUDE = &quot;**/*.sol&quot;;
+    private static final String DEFAULT_PACKAGE = &quot;org.web3j.model&quot;;
+    private static final String DEFAULT_SOURCE_DESTINATION = &quot;src/main/java&quot;;
+    private static final String DEFAULT_SOLIDITY_SOURCES = &quot;src/main/resources&quot;;
+    private static final String DEFAULT_OUTPUT_FORMAT = &quot;java&quot;;
+
+    @Parameter(property = &quot;packageName&quot;, defaultValue = DEFAULT_PACKAGE)
+    protected String packageName;
+
+    @Parameter(property = &quot;sourceDestination&quot;, defaultValue = DEFAULT_SOURCE_DESTINATION)
+    protected String sourceDestination;
+
+<span class="fc" id="L45">    @Parameter(property = &quot;outputDirectory&quot;)</span>
+    protected SourceDestination outputDirectory = new SourceDestination();
+
+<span class="fc" id="L48">    @Parameter(property = &quot;soliditySourceFiles&quot;)</span>
+    protected FileSet soliditySourceFiles = new FileSet();
+
+    @Parameter(property = &quot;contract&quot;)
+    protected Contract contract;
+
+    @Parameter(property = &quot;nativeJavaType&quot;, defaultValue = &quot;true&quot;)
+    protected boolean nativeJavaType;
+
+    @Parameter(property = &quot;outputFormat&quot;, defaultValue = DEFAULT_OUTPUT_FORMAT)
+    protected String outputFormat;
+
+    private Path createPath(String destinationPath) throws IOException {
+<span class="fc" id="L61">        Path path = Paths.get(destinationPath, packageName);</span>
+
+<span class="fc bfc" id="L63" title="All 2 branches covered.">        if (Files.notExists(path)) {</span>
+<span class="fc" id="L64">            Files.createDirectories(path);</span>
+        }
+<span class="fc" id="L66">        return path;</span>
+    }
+
+    private Map&lt;String, Map&lt;String, String&gt;&gt; extractContracts(String result) throws MojoExecutionException {
+        try {
+<span class="fc" id="L71">            ScriptEngine engine = new ScriptEngineManager(null).getEngineByName(&quot;nashorn&quot;);</span>
+<span class="fc" id="L72">            String script = &quot;JSON.parse(JSON.stringify(&quot; + result + &quot;))&quot;;</span>
+<span class="fc" id="L73">            Map&lt;String, Object&gt; json = (Map&lt;String, Object&gt;) engine.eval(script);</span>
+<span class="fc" id="L74">            Map&lt;String, Map&lt;String, String&gt;&gt; contracts = (Map&lt;String, Map&lt;String, String&gt;&gt;) json.get(&quot;contracts&quot;);</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">            if (contracts == null) {</span>
+<span class="fc" id="L76">                getLog().warn(&quot;no contracts found&quot;);</span>
+<span class="fc" id="L77">                return null;</span>
+            }
+<span class="fc" id="L79">            Map&lt;String, String&gt; contractRemap = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">            for (String contractFilename : contracts.keySet()) {</span>
+<span class="fc" id="L81">                Map&lt;String, String&gt; contractMetadata = contracts.get(contractFilename);</span>
+<span class="fc" id="L82">                String metadata = contractMetadata.get(&quot;metadata&quot;);</span>
+<span class="pc bpc" id="L83" title="1 of 4 branches missed.">                if (metadata == null || metadata.length() == 0) {</span>
+<span class="fc" id="L84">                    contracts.remove(contractFilename);</span>
+<span class="fc" id="L85">                    continue;</span>
+                }
+<span class="fc" id="L87">                getLog().debug(&quot;metadata:&quot; + metadata);</span>
+<span class="fc" id="L88">                String metadataScript = &quot;JSON.parse(JSON.stringify(&quot; + metadata + &quot;))&quot;;</span>
+<span class="fc" id="L89">                Map&lt;String, Object&gt; metadataJson = (Map&lt;String, Object&gt;) engine.eval(metadataScript);</span>
+<span class="fc" id="L90">                Object settingsMap = metadataJson.get(&quot;settings&quot;);</span>
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">                if (settingsMap != null) {</span>
+<span class="fc" id="L92">                    Map&lt;String, String&gt; compilationTarget = ((Map&lt;String, Map&lt;String, String&gt;&gt;) settingsMap).get(&quot;compilationTarget&quot;);</span>
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">                    if (compilationTarget != null) {</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">                        for (Map.Entry&lt;String, String&gt; entry : compilationTarget.entrySet()) {</span>
+<span class="fc" id="L95">                            String value = entry.getValue();</span>
+<span class="fc" id="L96">                            contractRemap.put(contractFilename, value);</span>
+<span class="fc" id="L97">                        }</span>
+                    }
+                }
+<span class="fc" id="L100">                Map&lt;String, String&gt; compiledContract = contracts.remove(contractFilename);</span>
+<span class="fc" id="L101">                String contractName = contractRemap.get(contractFilename);</span>
+<span class="fc" id="L102">                contracts.put(contractName, compiledContract);</span>
+<span class="fc" id="L103">            }</span>
+<span class="fc" id="L104">            return contracts;</span>
+<span class="nc" id="L105">        } catch (ScriptException e) {</span>
+<span class="nc" id="L106">            throw new MojoExecutionException(&quot;Could not parse SolC result&quot;, e);</span>
+        }
+    }
+
+    private String parseSoliditySources(Collection&lt;String&gt; includedFiles) throws MojoExecutionException {
+<span class="pc bpc" id="L111" title="1 of 4 branches missed.">        if (includedFiles == null || includedFiles.isEmpty())</span>
+<span class="fc" id="L112">            return &quot;{}&quot;;</span>
+<span class="fc" id="L113">        CompilerResult result = SolidityCompiler.getInstance(getLog()).compileSrc(</span>
+<span class="fc" id="L114">                soliditySourceFiles.getDirectory(),</span>
+                includedFiles,
+                SolidityCompiler.Options.ABI,
+                SolidityCompiler.Options.BIN,
+                SolidityCompiler.Options.INTERFACE,
+                SolidityCompiler.Options.METADATA
+        );
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">        if (result.isFailed()) {</span>
+<span class="nc" id="L122">            throw new MojoExecutionException(&quot;Could not compile solidity files\n&quot; + result.errors);</span>
+        }
+
+<span class="fc" id="L125">        getLog().debug(&quot;\t\tResult:\t&quot; + result.output);</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">        if (result.errors.contains(&quot;Warning:&quot;)) {</span>
+<span class="fc" id="L127">            getLog().info(&quot;\tCompile Warning:\n&quot; + result.errors);</span>
+        } else {
+<span class="fc" id="L129">            getLog().debug(&quot;\t\tError: \t&quot; + result.errors);</span>
+        }
+<span class="fc" id="L131">        return result.output;</span>
+    }
+
+    private void processContractFile(Collection&lt;String&gt; files) throws MojoExecutionException {
+<span class="fc" id="L135">        String result = parseSoliditySources(files);</span>
+<span class="fc" id="L136">        processResult(result, &quot;\tNo Contract found in files '&quot; + files + &quot;'&quot;);</span>
+<span class="fc" id="L137">    }</span>
+
+    public void execute() throws MojoExecutionException {
+<span class="fc" id="L140">        System.out.println(&quot;this is a test&quot;);</span>
+
+<span class="fc bfc" id="L142" title="All 2 branches covered.">        if (soliditySourceFiles.getDirectory() == null) {</span>
+<span class="fc" id="L143">            getLog().info(&quot;No solidity directory specified, using default directory [&quot; + DEFAULT_SOLIDITY_SOURCES + &quot;]&quot;);</span>
+<span class="fc" id="L144">            soliditySourceFiles.setDirectory(DEFAULT_SOLIDITY_SOURCES);</span>
+        }
+<span class="fc bfc" id="L146" title="All 2 branches covered.">        if (soliditySourceFiles.getIncludes().isEmpty()) {</span>
+<span class="fc" id="L147">            getLog().info(&quot;No solidity contracts specified, using the default [&quot; + DEFAULT_INCLUDE + &quot;]&quot;);</span>
+<span class="fc" id="L148">            soliditySourceFiles.setIncludes(Collections.singletonList(DEFAULT_INCLUDE));</span>
+        }
+
+<span class="fc" id="L151">        String[] files = new FileSetManager().getIncludedFiles(soliditySourceFiles);</span>
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">        if (files != null) {</span>
+<span class="fc" id="L153">            processContractFile(Stream.of(files)</span>
+<span class="fc" id="L154">                    .filter(f -&gt; {</span>
+<span class="fc" id="L155">                        getLog().info(&quot;Adding to process '&quot; + f + &quot;'&quot;);</span>
+<span class="fc" id="L156">                        return true;</span>
+                    })
+<span class="fc" id="L158">                    .collect(Collectors.toList()));</span>
+        }
+<span class="fc" id="L160">    }</span>
+
+    private void generatedAbi(Map&lt;String, String&gt; contractResult, String contractName) {
+<span class="fc bfc" id="L163" title="All 2 branches covered.">        if (!StringUtils.containsIgnoreCase(outputFormat, &quot;abi&quot;)) {</span>
+<span class="fc" id="L164">            return;</span>
+        }
+
+<span class="fc" id="L167">        String abiJson = contractResult.get(SolidityCompiler.Options.ABI.getName());</span>
+        try {
+<span class="fc" id="L169">            String filename = contractName + &quot;.json&quot;;</span>
+<span class="fc" id="L170">            Path path = createPath(StringUtils.defaultString(outputDirectory.getAbi(), sourceDestination));</span>
+<span class="fc" id="L171">            Files.write(Paths.get(path.toString(), filename), abiJson.getBytes());</span>
+<span class="nc" id="L172">        } catch (IOException e) {</span>
+<span class="nc" id="L173">            getLog().error(&quot;Could not build abi file for contract '&quot; + contractName + &quot;'&quot;, e);</span>
+<span class="fc" id="L174">        }</span>
+<span class="fc" id="L175">    }</span>
+
+    private void generatedBin(Map&lt;String, String&gt; contractResult, String contractName) {
+<span class="fc bfc" id="L178" title="All 2 branches covered.">        if (!StringUtils.containsIgnoreCase(outputFormat, &quot;bin&quot;)) {</span>
+<span class="fc" id="L179">            return;</span>
+        }
+
+<span class="fc" id="L182">        String binJson = contractResult.get(SolidityCompiler.Options.BIN.getName());</span>
+        try {
+<span class="fc" id="L184">            String filename = contractName + &quot;.bin&quot;;</span>
+<span class="fc" id="L185">            Path path = createPath(StringUtils.defaultString(outputDirectory.getBin(), sourceDestination));</span>
+
+<span class="fc" id="L187">            Files.write(Paths.get(path.toString(), filename), binJson.getBytes());</span>
+<span class="nc" id="L188">        } catch (IOException e) {</span>
+<span class="nc" id="L189">            getLog().error(&quot;Could not build bin file for contract '&quot; + contractName + &quot;'&quot;, e);</span>
+<span class="fc" id="L190">        }</span>
+<span class="fc" id="L191">    }</span>
+
+    private void generatedJavaClass(Map&lt;String, String&gt; results, String contractName) throws IOException, ClassNotFoundException {
+<span class="fc bfc" id="L194" title="All 2 branches covered.">        if (!StringUtils.containsIgnoreCase(outputFormat, &quot;java&quot;)) {</span>
+<span class="fc" id="L195">            return;</span>
+        }
+<span class="fc" id="L197">        new SolidityFunctionWrapper(nativeJavaType).generateJavaFiles(</span>
+                contractName,
+<span class="fc" id="L199">                results.get(SolidityCompiler.Options.BIN.getName()),</span>
+<span class="fc" id="L200">                results.get(SolidityCompiler.Options.ABI.getName()),</span>
+<span class="fc" id="L201">                StringUtils.defaultString(outputDirectory.getJava(), sourceDestination),</span>
+                packageName);
+<span class="fc" id="L203">    }</span>
+
+    private void processResult(String result, String warnMsg) throws MojoExecutionException {
+<span class="fc" id="L206">        Map&lt;String, Map&lt;String, String&gt;&gt; contracts = extractContracts(result);</span>
+<span class="fc bfc" id="L207" title="All 2 branches covered.">        if (contracts == null) {</span>
+<span class="fc" id="L208">            getLog().warn(warnMsg);</span>
+<span class="fc" id="L209">            return;</span>
+        }
+<span class="fc bfc" id="L211" title="All 2 branches covered.">        for (String contractName : contracts.keySet()) {</span>
+<span class="fc bfc" id="L212" title="All 2 branches covered.">            if (isFiltered(contractName)) {</span>
+<span class="fc" id="L213">                getLog().debug(&quot;\tContract '&quot; + contractName + &quot;' is filtered&quot;);</span>
+<span class="fc" id="L214">                continue;</span>
+            }
+            try {
+<span class="fc" id="L217">                Map&lt;String, String&gt; contractResult = contracts.get(contractName);</span>
+<span class="fc" id="L218">                generatedJavaClass(contractResult, contractName);</span>
+<span class="fc" id="L219">                generatedAbi(contractResult, contractName);</span>
+<span class="fc" id="L220">                generatedBin(contractResult, contractName);</span>
+<span class="fc" id="L221">                getLog().info(&quot;\tBuilt Class for contract '&quot; + contractName + &quot;'&quot;);</span>
+<span class="nc" id="L222">            } catch (ClassNotFoundException | IOException ioException) {</span>
+<span class="nc" id="L223">                getLog().error(&quot;Could not build java class for contract '&quot; + contractName + &quot;'&quot;, ioException);</span>
+<span class="fc" id="L224">            }</span>
+<span class="fc" id="L225">        }</span>
+<span class="fc" id="L226">    }</span>
+
+    private boolean isFiltered(String contractName) {
+<span class="fc bfc" id="L229" title="All 2 branches covered.">        if (contract == null) {</span>
+<span class="fc" id="L230">            return false;</span>
+        }
+
+<span class="pc bpc" id="L233" title="1 of 4 branches missed.">        if (contract.getExcludes() != null &amp;&amp; !contract.getExcludes().isEmpty()) {</span>
+<span class="fc" id="L234">            return contract.getExcludes().contains(contractName);</span>
+        }
+
+<span class="pc bpc" id="L237" title="1 of 4 branches missed.">        if (contract.getIncludes() == null || contract.getIncludes().isEmpty()) {</span>
+<span class="fc" id="L238">            return false;</span>
+        } else {
+<span class="fc bfc" id="L240" title="All 2 branches covered.">            return !contract.getIncludes().contains(contractName);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>
